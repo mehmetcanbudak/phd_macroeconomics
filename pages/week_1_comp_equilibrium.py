@@ -1,16 +1,16 @@
-import datetime
-from datetime import date, timedelta
-
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import plotly.io as pio
 import streamlit as st
 from matplotlib import pyplot as plt
-from plotly.subplots import make_subplots
+from st_pages import add_page_title
 
-import plotly_themes as thm
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
+
+### PAGE CONFIGS ###
+
+st.set_page_config(layout="wide")
+utl.local_css("src/styles/styles_pages.css")
 
 st.title("1. Competitive Equilibrium")
 
@@ -18,32 +18,14 @@ st.title("1. Competitive Equilibrium")
 st.header("Learn about Competitive Equilibrium Visually")
 # Dashboard description
 
-if "my_input" not in st.session_state:
-    st.session_state["my_input"] = ""
-
 st.markdown(
-    "This is where the project description will go. "
-    "This is a long description. "
-    "<br>"
-    "And one more line"
-    "<br>"
-    f"And here goes text from last page: {st.session_state['my_input']}",
+    """Page description - TBD.""",
     unsafe_allow_html=True,
 )
 
-
-# Functions to make columns with consistent width
-def two_cols():
-    return st.columns((0.1, 1, 0.1, 1, 0.1))
-
-
-def one_col():
-    return st.columns((0.5, 1, 0.5))
-
-
 # Create a simple chart with a slider
 # Row 0 with the title
-r0_s1, r0_c1, r0_s2 = one_col()
+r0_s1, r0_c1, r0_s2 = utl.narrow_col()
 
 
 def u_ln(c):

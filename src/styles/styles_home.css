@@ -1,0 +1,13 @@
+/* Reduce gap between elements */
+[data-testid=column]:nth-of-type(n) [data-testid=stVerticalBlock] {
+    gap: 1rem;
+}
+
+
+.numbered-header {
+    margin-bottom: 5px;
+}
+
+.numbered {
+    margin-left: 20px;
+}

@@ -4,16 +4,15 @@
 base = "light" 
 
 # Primary accent color for interactive elements.
-# primaryColor =
+# primaryColor = "red"
 
 # Background color for the main content area.
 # backgroundColor = "rgb(240, 252, 246)"
 # backgroundColor = "rgb(235, 255, 250)"
 
 
-
 # Background color used for the sidebar and most interactive widgets.
-# secondaryBackgroundColor =
+# secondaryBackgroundColor = "red"
 
 # Color used for almost all text.
 textColor = "black"

@@ -1,5 +1,8 @@
 numpy
 pandas
 plotly
-streamlit
+streamlit>=1.25.0
 matplotlib
+scikit-learn
+st_pages>=0.4.3
+statsmodels
