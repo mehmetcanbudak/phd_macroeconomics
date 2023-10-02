@@ -191,9 +191,7 @@ with c2:
         unsafe_allow_html=True,
     )
 
-    st.write(
-        f"Find a good source for top 10 things to know in macroeconomics."
-    )
+    st.write(f"Find a good source for top 10 things to know in macroeconomics.")
     st.write(f"Whom to follow on Twitter?")
 
     with st.expander("Click to expand", expanded=True):
