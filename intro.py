@@ -6,7 +6,7 @@ import src.scripts.utils as utl
 
 st.set_page_config(
     page_title="PhD Macroeconomics",
-    page_icon="👋",
+    page_icon="🌐",
     layout="wide",
 )
 
@@ -19,9 +19,10 @@ show_pages_from_config()
 
 s1, c1, c2 = utl.wide_col()
 
-# my LinkedIn and GitHub
+# my LinkedIn, GitHub, and email
 linkedin_url = "https://www.linkedin.com/in/justinas-grigaitis/"
 github_url = "https://github.com/justgri"
+email_url = "mailto:justinas.grigaitis@econ.uzh.ch"
 
 # Intro
 with c1:
@@ -34,10 +35,11 @@ with c1:
     )
 
     st.markdown(
-        """**Disclaimer:** <br>
+        """
+        **Disclaimer:** <br>
         This website does not represent the official curriculum taught at my university. <br>
         My goal is to master the fundamentals of a few topics rather than scratch the surface of many. <br>
-        It might not even look like PhD level stuff, because topics are largely overlapping with the undergraduate course. <br>
+        It might not even look like PhD level stuff, because topics are largely overlapping with the undergraduate courses. <br>
         """,
         # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
         # Hopefully it will give insights to both PhD students, undergrads, and others.
@@ -46,9 +48,12 @@ with c1:
 
     st.markdown(
         f"""
-        Please send me comments: 
+        Please send me corections and suggestions: 
     <a href="{linkedin_url}" target="_blank">
         <i class="fab fa-linkedin fa-lg"></i>
+    </a>
+    <a href="{email_url}" target="_blank">
+        <i class="fas fa-envelope fa-lg"></i>
     </a>
     <a href="{github_url}" target="_blank">
         <i class="fab fa-github fa-lg"></i>
