@@ -1,7 +1,7 @@
 import streamlit as st
-from st_pages import Page, add_page_title, show_pages, show_pages_from_config
+from st_pages import Page, show_pages_from_config
 
-import src.scripts.plot_themes as thm
+import src.scripts.plot_themes
 import src.scripts.utils as utl
 
 st.set_page_config(
@@ -19,6 +19,13 @@ show_pages_from_config()
 
 s1, c1, c2 = utl.wide_col()
 
+utl.local_css("src/styles/styles_home.css")
+utl.external_css(
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+)
+
+s1, c1, c2 = utl.wide_col()
+
 # my LinkedIn, GitHub, and email
 linkedin_url = "https://www.linkedin.com/in/justinas-grigaitis/"
 github_url = "https://github.com/justgri"
@@ -26,29 +33,33 @@ email_url = "mailto:justinas.grigaitis@econ.uzh.ch"
 
 # Intro
 with c1:
-    st.title("Macroeconomics for PhD Students")
-    st.sidebar.success("Select a page above.")
+    # Title
+    st.title("PhD for All: Macroeconomics")
 
+    # Header
     st.markdown(
-        "Trying to learn and enjoy the first year of Econ PhD. <br> Procrastinating productively. <br> All mistakes are my own.",
+        '<span style="font-size: 28px; display: block; margin-bottom: 5px;">*Interactive visuals. Rigorous theory. Simple code.*</span>',
         unsafe_allow_html=True,
     )
 
     st.markdown(
-        """
-        **Disclaimer:** <br>
-        This website does not represent the official curriculum taught at my university. <br>
-        My goal is to cover fewer topics in greater depth rather than scratch the surface of many. <br>
-        Visuals are meant to capture the key concepts, which could be helpful to undergraduate students and industry professionals, too. <br>
-        """,
-        # Main difference is matrix algebra and proving everything along the way, which might not always be included here.
-        # Hopefully it will give insights to both PhD students, undergrads, and others.
+        "<hr style='margin-top: 0; margin-bottom: 5px;'>",
         unsafe_allow_html=True,
     )
 
+    st.markdown(
+        r"""Learning and helping others learn along the way.<br>
+            Explaining PhD concepts intuitively.<br>
+            Procrastinating productively.""",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        r"""Targeted at **grad students**, but useful for **professionals** and **undergrads** alike.""",
+        unsafe_allow_html=True,
+    )
     st.markdown(
         f"""
-        Please send me corections and suggestions: 
+        Please send me feedback:<br>
     <a href="{linkedin_url}" target="_blank">
         <i class="fab fa-linkedin fa-lg"></i>
     </a>
@@ -62,8 +73,108 @@ with c1:
         unsafe_allow_html=True,
     )
 
+    st.markdown(
+        r"""<u>**Disclaimer:**</u> <br>
+        This website does not represent the official curriculum taught at my university. <br>
+        My goal is to cover fewer topics in greater depth rather than scratch the surface of many. <br>
+        All mistakes are my own.
+        """,
+        unsafe_allow_html=True,
+    )
 
-s1, c2, s2 = utl.narrow_col()
+
+_, note_col, _ = st.columns((0.02, 1, 1.5))
+with note_col:
+    with st.expander("For mobile users:"):
+        st.write("Sidebar leads to other pages within this app.")
+        st.image("src/images/intro_mobile_sidebar.png", width=200)
+
+s1, c2, s2 = utl.wide_col()
+
+
+# Preliminary ToC
+with c2:
+    st.markdown(
+        "<h3 style='text-align: center'>Table of Contents</h3>",
+        unsafe_allow_html=True,
+    )
+
+    with st.expander("Click to expand"):
+        # Page links - potentially hrefs with st.experimental_set_query_params()
+        path_tools = "https://phd-econometrics.streamlit.app/Must-know"
+        path_ols = "https://phd-econometrics.streamlit.app/Linear%20Regression"
+        path_ols_3d = "https://phd-econometrics.streamlit.app/OLS%20in%203D"
+        path_fit = "https://phd-econometrics.streamlit.app/Fit%20Measures"
+
+        st.markdown(
+            r"""
+            Hyperlinks lead to the corresponding pages on this website.""",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""[**Top 10 theory tools**]({path_tools})"""
+            + r""" **that everyone should know according to Jeffrey Wooldridge**
+        """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            r"""
+    <div class="numbered-header">
+        <b>Section 1: Endowment Economy</b><br>
+    </div>
+        
+    <div class="numbered">
+        1. Topic 1 (SLP Chapters) <br>
+        2. Topic 2 (SLP Chapters) <br>
+    </div>
+
+    <br>
+
+    <div class="numbered-header">
+        <b>Section 2: Dynamic Programming</b><br>
+    </div>
+        
+    <div class="numbered">
+        3. Topic 3 (SLP Chapters) <br>
+        4. Topic 4 (SLP Chapters) <br>
+    </div>
+
+    <br>
+
+    Next semester - TBD. <br>
+    Bonus if time permits (it never does) - TBD.<br>
+
+    Chapters follow Stokey, Lucas, Prescott *Recursive Methods in Economic Dynamics* (1989).<br>
+    Chapters from Ljungqvist and Sargent *Recursive Macroeconomic Theory* (2012) are added were relevant.<br>
+    Subsections are likely to change depending on which topics I find most interesting or challenging.
+
+    """,
+            unsafe_allow_html=True,
+        )
+
+# What is Macroeconomics?
+with c2:
+    st.markdown(
+        "<h3 style='text-align: center'>What is Macroeconomics?</h3>",
+        unsafe_allow_html=True,
+    )
+
+    econometrica_public = "https://www.sv.uio.no/econ/om/tall-og-fakta/nobelprisvinnere/ragnar-frisch/published-scientific-work/rf-published-scientific-works/rf1933c.pdf"
+
+    st.markdown(
+        r"""
+        Find a quote
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""Find a quote (free access [link]({econometrica_public}))""",
+        unsafe_allow_html=True,
+    )
+
 
 # Textbooks
 with c2:
@@ -121,93 +232,3 @@ with c2:
         "https://youtube.com/playlist?list=PLJZlW3ik4xixAhVnY0aaTrz72XCZsygEA&si=_j3pktBu8xdRvEHS",
         type="secondary",
     )
-
-
-with c2:
-    st.markdown(
-        "<h3 style='text-align: center'>What is Macroeconomics?</h3>",
-        unsafe_allow_html=True,
-    )
-
-    econometrica_public = "https://www.sv.uio.no/econ/om/tall-og-fakta/nobelprisvinnere/ragnar-frisch/published-scientific-work/rf-published-scientific-works/rf1933c.pdf"
-
-    st.markdown(
-        r"""
-        Find a quote
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""Find a quote (free access [link]({econometrica_public}))""",
-        unsafe_allow_html=True,
-    )
-
-# Preliminary ToC
-
-with c2:
-    st.markdown(
-        "<h3 style='text-align: center'>Tentative Table of Contents</h3>",
-        unsafe_allow_html=True,
-    )
-
-    with st.expander("Click to expand", expanded=False):
-        st.write(
-            "Chapters follow Stokey, Lucas, Prescott *Recursive Methods in Economic Dynamics* (1989). Chapters from Ljungqvist and Sargent *Recursive Macroeconomic Theory* (2012) are added were relevant."
-        )
-        st.write(
-            "Subsections are likely to change depending on which topics I find most interesting or challenging."
-        )
-
-        st.markdown(
-            r"""
-    <div class="numbered-header">
-        <b>Section 1: Endowment Economy</b><br>
-    </div>
-        
-    <div class="numbered">
-        1. Topic 1 (SLP Chapters) <br>
-        2. Topic 2 (SLP Chapters) <br>
-    </div>
-
-    <br>
-
-    <div class="numbered-header">
-        <b>Section 2: Dynamic Programming</b><br>
-    </div>
-        
-    <div class="numbered">
-        3. Topic 3 (SLP Chapters) <br>
-        4. Topic 4 (SLP Chapters) <br>
-    </div>
-
-    <br>
-
-    Next semester - TBD. <br>
-    Bonus if time permits (it never does) - TBD.
-    """,
-            unsafe_allow_html=True,
-        )
-
-# Wooldridge Top 10
-with c2:
-    st.markdown(
-        "<h3 style='text-align: center'>10 Tools for Macroeconomics</h3>",
-        unsafe_allow_html=True,
-    )
-
-    st.write(f"Find a good source for top 10 things to know in macroeconomics.")
-    st.write(f"Whom to follow on Twitter?")
-
-    with st.expander("Click to expand", expanded=True):
-        st.markdown(
-            r"""
-        1. **Top 1 thing to know** <br>
-        Some fancy formula: $E[x] = E[E[x|y]]$ <br>
-        
-        2. **Top 2 thing to know** <br>
-        Some other fancy formula: $E[x] = E[E[x|y]]$ <br>
-        
-        """,
-            unsafe_allow_html=True,
-        )

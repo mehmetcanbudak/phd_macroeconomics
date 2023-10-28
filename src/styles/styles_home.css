@@ -1,9 +1,11 @@
 body .stMarkdown {
-    font-size: 20px;
+    font-size: 18px;
+    /* font-size: 25px; */
 }
 
 html {
-    font-size: 20px;
+    font-size: 18px;
+    /* font-size: 25px; */
 }
 
 /* Reduce gap between elements */
@@ -18,4 +20,10 @@ html {
 
 .numbered {
     margin-left: 20px;
+}
+
+.stImage img {
+    display: block;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }

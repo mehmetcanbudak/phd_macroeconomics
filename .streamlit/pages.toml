@@ -4,6 +4,11 @@ name = "Introduction"
 icon = "🏠"
 
 [[pages]]
-path = "pages/week_1_comp_equilibrium.py"
-name = "Week 1 - General Equilibrium"
-icon = "📖"
+path = "pages/0_tools.py"
+name = "Must-know"
+icon = "🛠"
+
+[[pages]]
+path = "pages/1_cake_eating.py"
+name = "Cake Eating"
+icon = "🍰"
