@@ -560,15 +560,15 @@ with c03:
 
         col_c, col_w = st.columns((1, 1))
 
-        st.markdown(
-            """
-        <style>
-        .katex-html {
-            text-align: left;
-        }
-        </style>""",
-            unsafe_allow_html=True,
-        )
+        # st.markdown(
+        #     """
+        # <style>
+        # .katex-html {
+        #     text-align: left;
+        # }
+        # </style>""",
+        #     unsafe_allow_html=True,
+        # )
         # with col_t:
         #     st.latex("t")
         #     st.latex("t=0")
