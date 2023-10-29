@@ -96,7 +96,7 @@ pio.templates["my_streamlit"] = go.layout.Template(
         # Axes options
         xaxis=dict(
             automargin=False,
-            autorange=True,
+            autorange=False,
             categoryorder="sum descending",
             color="black",
             gridcolor="white",
@@ -112,11 +112,11 @@ pio.templates["my_streamlit"] = go.layout.Template(
             layer="above traces",
             showticklabels=True,
             showspikes=True,
-            spikethickness=1,
+            spikethickness=1.5,
         ),
         yaxis=dict(
             automargin="left+right",
-            autorange=True,
+            autorange=False,
             categoryorder="sum descending",
             color="black",
             gridcolor="lightgrey",
@@ -126,7 +126,7 @@ pio.templates["my_streamlit"] = go.layout.Template(
             linewidth=2,
             # ticks="",
             ticks="outside",
-            tickformat="$,.0f",
+            tickformat=",.0f",
             title=dict(
                 standoff=0.05,
                 text="",
@@ -137,6 +137,8 @@ pio.templates["my_streamlit"] = go.layout.Template(
             zerolinewidth=2,
             layer="above traces",
             rangemode="tozero",
+            showspikes=True,
+            spikethickness=1.5,
         ),
         colorway=px.colors.qualitative.G10,
     ),

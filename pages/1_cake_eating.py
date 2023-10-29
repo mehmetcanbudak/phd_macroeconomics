@@ -5,11 +5,13 @@ import time
 
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
+import plotly.graph_objs as go
+import plotly.io as pio
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
+from plotly.subplots import make_subplots
 from scipy.stats import t
 from st_pages import show_pages_from_config
 
@@ -58,43 +60,65 @@ s1, c01, s2 = utl.wide_col()
 
 with c01:
     st.title("Cake Eating Problem")
+    st.header("Visualizing Optimal Consumption")
     st.divider()
-    st.header("1. Visualizing Optimal Consumption")
+    st.header("1. Cake eating with finite horizon")
 
     st.markdown(
-        r"""Suppose you get a cake of size $W$ and you want to eat it over ($T+1$) days.<br>
-        You want to be smart about it and ask yourself: what is the **optimal consumption** each day to maximize your happiness derived from eating the entire cake?<br>
+        r"""Suppose you get a cake of size $W$ and you want to eat it over ($T+1$) day.
+        You want to be smart about it and ask yourself: what is the **optimal consumption** each day to maximize your happiness derived from eating the entire cake?
         We formulate this problem as follows:<br>
         """,
         unsafe_allow_html=True,
     )
 
     st.latex(
-        r"""\sum_{t=0}^{T} \beta^t u(c_t) \\
+        r""" \max_{\{c_t\}_{t=0}^T} \sum_{t=0}^{T} \beta^t u(c_t) \\
+        \\[5pt]
         \text{s.t.} \sum_{t=0}^{T} c_t \leq W\\
+        \\[5pt]
+          w_{t+1} = w_t - c_t,\; c_t\geq 0 \; \forall t\\
              """
+    )
+    st.markdown(
+        r"""Given a specific utility function, an analytical solution can be found by setting $c_T = w_T$, using Euler equation from FOC, and solving backwards.
+        The solution is given below with $u(c) = \text{ln}(c)$. If utility function is CRRA, then $\beta$ has to be replaced with $\beta^{\frac{1}{\gamma}}$.
+        """,
+        unsafe_allow_html=True,
+    )
+    st.latex(
+        r""" c_0 = \dfrac{W}{\sum_{t=0}^{T} \beta^t} = W \dfrac{1-\beta}{1-\beta^{T+1}} \\
+        \\[5pt]
+             c_t = \beta c_{t-1} = \beta^t c_0 \; \forall t \\"""
     )
 
     st.markdown(
         r"""
-        $\beta$ indicates your impatience - you feel like eating the same amount of cake tomorrow will give you less happiness than today.<br>
-        $u(c)$ is your utility of consuming $c$ amount of cake. Utility function usually has a concave shape, which indicates that each bite of cake gives you less happiness than the previous one.<br>
-        You can already see that these two factors go in opposite directions - because you're impatient, you'd prefer to it the cake faster, but because of diminishing marginal utility, you'd prefer to eat it slower.<br>
-        Let's see how you should optimally eat the cake, given different $\beta$, $u(c)$, and $T$.<br>
-        Cake size is fixed to $W=100$.
+        Let's see how you should optimally eat the cake, given different $\beta$, $u(c)$, and $T$. Cake size is fixed to $W=100$.
+       
         """,
         unsafe_allow_html=True,
     )
-
-    with st.expander("See a comment on trivial cases:"):
+    with st.expander(
+        "See a comment on parameter interpretation and trivial cases:"
+    ):
+        st.markdown(
+            r"""
+         $\beta$ indicates your **impatience** - you feel like eating the same amount of cake tomorrow will give you less happiness than today. $u(c)$ is your **utility** of consuming $c$ amount of cake.
+        Utility function usually has a concave shape, which indicates that each bite of cake gives you less happiness than the previous one. With CRRA utility, $\gamma$ modifies the curvature of the function
+        and thus indicates the preference for **consumption smoothing** (risk aversion).<br>
+        You can already see that these factors go in opposite directions - because you're impatient, you'd prefer to it the cake faster, but because of diminishing marginal utility, you'd prefer to eat it slower.<br>
+                    """,
+            unsafe_allow_html=True,
+        )
         st.markdown(
             r"""
             1. If your utility was linear ($u(c) = c$) and you were perfectly patient ($\beta = 1$), then you wouldn't care at all which day how much to eat - any consumption plan would be optimal.<br>
             2. If your utility was linear ($u(c) = c$), but you were impatient ($\beta<1$), then you'd eat the entire cake on the first day.<br>
-            3. If your utility was concave ($u'(c) > 0, u''(c) < 0$), but you were perfectly patient ($\beta = 1$), then you'd eat the same amount of cake each day to perfectly smoothen your consumption.<br>
+            3. If your utility was concave, but you were perfectly patient ($\beta = 1$), then you'd eat the same amount of cake each day to perfectly smoothen your consumption.<br>
             
             Therefore, the only interesting case is when you're impatient and your utility is concave (i.e., exhibits marginal utility is diminishing).
-""",
+                    """,
             unsafe_allow_html=True,
         )
 
@@ -111,7 +135,7 @@ with input_col:
         step=0.01,
     )
     T = st.number_input(
-        r"Select $T$ (number of days):",
+        r"Select $T$ (last period):",
         min_value=2,
         max_value=100,
         value=15,
@@ -206,89 +230,134 @@ consumption, remaining_cake = solve_cake_finite(
 )
 
 
-def plot_consumption(
+pio.templates.default = "my_streamlit"
+
+
+def plot_consumption_plotly(
     consumption, remaining_cake, T, beta, utility_fn, gamma=None
 ):
-    fig, ax1 = plt.subplots(figsize=(6, 4))
+    # Create subplots and specify we want two y-axes
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    # Plot consumption on primary y-axis
-    ax1.plot(
-        range(T + 2),
-        consumption,
-        label=r"Consumption",
-        color="blue",
-        alpha=0.7,
-        linewidth=2,
-        zorder=5,
-    )
-    ax1.set_xlabel("t", fontweight="bold")
-    ax1.set_ylabel(r"Consumption (cₜ)", fontweight="bold", color="blue")
-    ax1.tick_params(axis="y", labelcolor="blue")
-
-    # Create and plot remaining cake on secondary y-axis
-    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-    ax2.plot(
-        range(T + 2),
-        remaining_cake,
-        label="Remaining Cake",
-        color="green",
-        alpha=0.7,
-        linestyle="--",
-        linewidth=2.5,
-        zorder=10,
+    # Add consumption series
+    fig.add_trace(
+        go.Scatter(
+            x=list(range(T + 2)),
+            y=consumption,
+            mode="lines",
+            name="Consumption",
+            line=dict(color="green", width=2),
+            hovertemplate="t = %{x}<br>c<sub>t</sub> = %{y:.1f}<extra></extra>",
+            showlegend=False,
+        ),
+        secondary_y=False,
     )
 
-    # Add a grey vertical line at T
-    ax1.axvline(x=T, color="grey", linestyle="--", alpha=0.5)
-
-    # Add a text box next to the line at the top saying T={T}
-    ax1.text(
-        T * 1.02,
-        consumption[0],
-        f"t={T}",
-        color="grey",
-        verticalalignment="bottom",
-        horizontalalignment="left",
+    # Add remaining cake series
+    fig.add_trace(
+        go.Scatter(
+            x=list(range(T + 2)),
+            y=remaining_cake,
+            mode="lines",
+            name="Remaining Cake",
+            line=dict(color="blue", width=2, dash="dash"),
+            hovertemplate="t = %{x}<br>w<sub>t</sub> = %{y:.1f}<extra></extra>",
+            showlegend=False,
+        ),
+        secondary_y=True,
     )
 
-    ax2.set_ylabel(r"Remaining Cake (wₜ)", fontweight="bold", color="green")
-    ax2.tick_params(axis="y", labelcolor="green")
-
-    # Layout settings
-    ax1.set_xlim([-1, T + 3])
-    ax1.set_ylim([0, 1.1 * consumption[0]])
-    ax2.set_ylim([0, 1.1 * remaining_cake[0]])
-
-    # Set x-axis tick format
-    ax1.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: "%.0f" % x))
-
-    # ax1.legend(loc="upper left", fontsize="small")
-    # ax2.legend(loc="upper right", fontsize="small")
-
-    plt.title(
-        f"Cake Eating with {utility_fn} Utility",
-        fontdict={"size": 14, "weight": "bold"},
+    # Add vertical line and text for T
+    fig.add_vline(x=T, line=dict(color="grey", dash="dash", width=2))
+    fig.add_annotation(
+        x=T * 1.03,
+        y=consumption[0],
+        text=f"t={T}",
+        showarrow=False,
+        xshift=10,
+        font=dict(color="grey", size=15),
     )
 
-    plt.tight_layout()  # ensures that labels don't get cut off
+    # x axis limit
+    if T < 10:
+        x_ub = T + 1.2
+    else:
+        x_ub = T * 1.12
+
+    # Add horizontal line shape
+    fig.add_shape(
+        type="line",
+        x0=-0.5,  # Start line at the beginning of the x-axis range
+        y0=1.1 * max(consumption),
+        x1=x_ub,  # End line at the end of the x-axis range
+        y1=1.1 * max(consumption),
+        line=dict(color="black", width=2),
+        xref="x",  # Refer to the x-axis
+        yref="y",  # Use "y2" if the line should refer to the right y-axis
+    )
+
+    # Layout settings - in addition to my_streamlit default theme from custom thm module
+    fig.update_layout(
+        width=600,  # Width in pixels
+        height=400,
+        margin=dict(autoexpand=True, l=30, r=40, t=30, b=40, pad=0),
+        font=dict(family="Sans-Serif"),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        title=dict(
+            text=f"<b>Cake Eating with {utility_fn} Utility</b>",
+            font=dict(size=20),
+            x=0.5,
+            xanchor="center",
+            xref="paper",
+            y=0.98,
+            yanchor="top",
+            yref="container",
+        ),
+        hovermode="closest",
+        hoverlabel=dict(
+            font=dict(family="Sans-Serif", color="black"),
+            bgcolor="rgb(255, 255, 255)",  # rgb(0, 0, 0, 0)
+            bordercolor="black",
+            namelength=-1,
+        ),
+        xaxis=dict(
+            range=[-0.5, x_ub],
+            showgrid=False,
+            zeroline=False,
+            autorange=False,
+            title=dict(text="<b>t</b>", font=dict(size=16)),
+        ),
+        yaxis=dict(
+            range=[0, 1.1 * max(consumption)],
+            autorange=False,
+            showgrid=False,
+            title=dict(
+                text="<b>Consumption (cₜ)</b>",
+                font=dict(size=16, color="green"),
+            ),
+        ),
+        yaxis2=dict(
+            range=[0, 1.1 * max(remaining_cake)],
+            autorange=False,
+            showgrid=False,
+            title=dict(
+                text="<b>Remaining Cake (wₜ)</b>",
+                font=dict(size=16, color="blue"),
+            ),
+        ),
+    )
+
     return fig
 
 
-chart_fig = plot_consumption(
+chart_fig = plot_consumption_plotly(
     consumption, remaining_cake, T, beta, utility_function, gamma
 )
 
 # Plot chart
 with chart_col:
-    # Error handling was thought necessary avoid an error when clicking incrementing input widgets too fast
-    # error caused by latex rendering in axes titles (e.g., $c_t$)
-    # it didn't always solve the problem, so I removed latex from axes titles altogether
-    try:
-        time.sleep(0.3)
-        st.pyplot(chart_fig, use_container_width=True)
-    except:
-        time.sleep(0.3)
-        st.pyplot(chart_fig, use_container_width=True)
+    st.plotly_chart(chart_fig, theme=None, use_container_width=True)
 
 
 ### PREPARE DATA FOR TABLE
@@ -326,16 +395,13 @@ def display_table(df, N=5):
 
 pie_col, table_col = st.columns((1, 0.7))
 
-if "current_frame" not in st.session_state:
-    st.session_state["zero_frame"] = 0
-
 
 ### BUILD ANIMATED PIE CHART
 def pie_chart_animated(consumption, remaining_cake, T):
     fig = go.Figure()
 
     def create_title(t_title):
-        font_settings = dict(family="Arial, sans-serif", size=16)
+        font_settings = dict(family="Sans-Serif", size=16)
 
         if t_title <= T:
             rem_cake_label = remaining_cake[t_title + 1]
@@ -357,14 +423,38 @@ def pie_chart_animated(consumption, remaining_cake, T):
 
     # Make data
     def make_pie_data(consumption, remaining_cake, T, t):
-        labels_eaten = [f"c_{i}" for i in range(t + 1)]
         values_eaten = list(consumption[: t + 1])
 
+        # filter to not show values for slices below 4
+        labels_eaten = [
+            f"c_{i}<br>{consumption[i]:.1f}"
+            if consumption[i] > 4
+            else f"c_{i}"
+            for i in range(t + 1)
+        ]
+        # filter to not show any label for slices below 1
+        # empty space doesn't work, since plotly treats identical labels as a single trace
+        # create labels with invisible character * slice number to keep them unique but invisible
+        invisible_char = "\u200B"
+
+        labels_eaten = [
+            labels_eaten[i] if consumption[i] > 1 else "\u200B" * i
+            for i in range(t + 1)
+        ]
+
+        hovertext_eaten = [
+            f"c_{i} = {consumption[i]:.1f}" for i in range(t + 1)
+        ]
+
         if t < T:
-            labels = labels_eaten + [f"w_{t+1}"]
+            labels = labels_eaten + [f"w_{t+1}<br>{remaining_cake[t+1]:.1f}"]
             value_remaining = [remaining_cake[t + 1]]
+            hovertext = hovertext_eaten + [
+                f"w_{t+1} = {remaining_cake[t+1]:.1f}"
+            ]
         else:
             labels = labels_eaten
+            hovertext = hovertext_eaten
             value_remaining = []
 
         values = values_eaten + value_remaining
@@ -378,20 +468,29 @@ def pie_chart_animated(consumption, remaining_cake, T):
             values=values,
             pull=pull_values,
             marker=dict(colors=colors),
+            hovertext=hovertext,  # Set custom hovertext for each slice
+            hoverinfo="text",  # Ensure that the custom hovertext is used
+            textinfo="label",
+            textposition="inside",
         )
 
     # Make first frame
     fig.add_trace(go.Pie(**make_pie_data(consumption, remaining_cake, T, t=0)))
 
     fig.update_traces(
-        textinfo="label+percent",
+        textinfo="label",
+        # texttemplate="%{label}<br>%{value:.1f}", # this is helpful without conditional labels
+        hoverinfo="label",
         direction="clockwise",
         sort=False,
         showlegend=False,
     )
 
-    fig["layout"]["margin"] = dict(t=90, l=0, b=0, r=0)
-    fig["layout"]["title"] = create_title(0)
+    fig.update_layout(
+        margin=dict(t=80, l=0, b=0, r=0),
+        title=create_title(0),
+        font=dict(family="Sans-Serif"),
+    )
 
     # Define slider properties
     sliders_dict = {
@@ -529,7 +628,7 @@ with pie_col:
 
 with table_col:
     # display data table
-    st.markdown("#### Data")
+    st.markdown("#### Chart data")
     display_table(data_df)
 
 s0, c03, s1 = utl.wide_col()
@@ -591,7 +690,7 @@ with c03:
             st.latex("rem. \; cake \; w_t")
             st.latex("w_0 = W")
             st.latex(
-                r"w_1 = w_0 - c_0 = w_0\frac{ \sum_{t=1}^T \beta}{\sum_{t=0}^T \beta^t}"
+                r"w_1 = w_0 - c_0 = w_0\frac{ \sum_{t=1}^T \beta^t}{\sum_{t=0}^T \beta^t}"
             )
             st.latex(r"w_2 = w_1 - c_1 = w_1\frac{\beta }{1+\beta} ")
             st.markdown("...")
@@ -612,7 +711,7 @@ with c03:
         )
 
 with c03:
-    st.header("2. Cake Eating with Infinite Horizon")
+    st.header("2. Cake eating with infinite horizon")
     st.markdown(
         r"""
     Now suppose you don't know how many days you have to eat the cake and potentially can eat for the rest of your life.<br>
