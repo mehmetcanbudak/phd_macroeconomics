@@ -125,10 +125,10 @@ with c01:
 input_col, _, chart_col = st.columns((0.5, 0.05, 1))
 
 ### WIDGETS
-# Input widgets
+### Input widgets
 with input_col:
     beta = st.number_input(
-        r"Select $\beta$ (impatience factor):",
+        r"Select $\beta$ (patience factor):",
         min_value=0.0,
         max_value=1.0,
         value=0.95,
@@ -644,7 +644,7 @@ with c03:
             $Formula \; TBD$
 
         2. TBD.
-        
+
             """,
             unsafe_allow_html=True,
         )
@@ -705,228 +705,374 @@ with c03:
             $Formula \; TBD$
 
         2. TBD.
-        
+
             """,
             unsafe_allow_html=True,
         )
 
-with c03:
-    st.header("2. Cake eating with infinite horizon")
-    st.markdown(
-        r"""
-    Now suppose you don't know how many days you have to eat the cake and potentially can eat for the rest of your life.<br>
-    How is your optimal consumption affected in that case?
-""",
-        unsafe_allow_html=True,
-    )
 
 s0, c04, s1 = utl.wide_col()
 
 with c04:
-    st.header("3. Theory with code")
-
-    def tabs_code_theory():
-        return st.tabs(["Theory", "Code QuantEcon", "Code numpy"])
-
-    ### Error sums
-    st.markdown(
-        "#### Error sums",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        """NB: Hayashi and Greene classically disagree on notation for the sum of squared residuals (SSE or SSR), so I'll follow Greene.""",
-        unsafe_allow_html=True,
-    )
-
-    f2_c1, f2_c2, f2_c3 = tabs_code_theory()
-    with f2_c1:
-        st.markdown(
-            r"""
-            Error Sum of Squares (SSE) aka Sum of Squared Residuals (SSR or RSS, hence confusion):<br>
-            $SSE = \sum_{i=1}^n (y_i-\hat{y_i})^2 = \sum_{i=1}^n (e_i)^2 =  \mathbf{e'e = \varepsilon' M \varepsilon}$<br>
-            (this is SSR according to Hayashi)<br>
-
-            Regression sum of squares (SSR) aka Explained Sum of Squares (ESS):<br>
-            $SSR = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{\hat{y}})^2$<br>
-            $SSR =  \mathbf{b'X'M^0Xb}$, where $\mathbf{M^0}$ is the centering matrix<br>
-
-            Total sum of squares (SST) aka Total Variation:<br>
-            $SST = \sum_{i=1}^n (y_i-\bar{y_i})^2 = \sum_{i=1}^n (\hat{y_i} - \bar{y})^2 + \sum_{i=1}^n (e_i)^2$ <br>
-            $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e = SSR + SSE}$<br>
-         """,
-            unsafe_allow_html=True,
-        )
-
-    with f2_c2:
-        ols_code_err_b = """
-        import statsmodels.api as sm
-        model = sm.OLS(y, X).fit()
-
-        # Sum of squared errors
-        SSE = model.ssr # this is SSE according to Greene
-
-        # Regression sum of squares
-        SSR = model.ess
-        
-        # Total sum of squares
-        SST = SSE + SSR
-        """
-
-        st.code(ols_code_err_b, language="python")
-
-    with f2_c3:
-        ols_code_err = """
-        import numpy as np
-
-        # Sum of squared errors
-        SSE = e.dot(e)
-        
-        # Regression sum of squares
-        y_hat_centered = y_hat - np.mean(y_hat)
-        SSR = y_hat_centered.dot(y_hat_centered)
-
-        # Total sum of squares
-        y_centered = y - np.mean(y)
-        SST = y_centered.dot(y_centered)
-        """
-        st.code(ols_code_err, language="python")
-
-    st.divider()
-
-    st.markdown("#### Model fit and selection measures")
+    st.header("2. Cake eating with infinite horizon")
     st.markdown(
         r"""
-        NB: $R^2$ definition below requires a constant term to be included in the model.<br>
+    Let's suppose that the cake never goes bad and you have an infinite amount of time to finish it.<br>
+    How would you choose an optimal consumption path in that case?<br>
+    This might sound unrealistic, but speaking more broadly,
+    a lot of optimization problems don't have a specific end date
+    (e.g., imagine that you pass the leftovers of the imperishable "cake" onto your children and they can pass it onto their children, etc.).
+    That's how economists often think about consumption-savings problems and other similar models.
+    Therefore, it's important to get familiar with the cake eating problem in an infinite horizon case.<br>
+""",
+        unsafe_allow_html=True,
+    )
+    st.markdown(r"""The problem then becomes:""", unsafe_allow_html=True)
+
+    st.latex(
+        r""" \max_{\{c_t\}_{t=0}^{\infty}} \sum_{t=0}^{\infty} \beta^t u(c_t) \\
+        \\[5pt]
+        \text{s.t.}w_{t+1} = w_t - c_t,\; c_t\geq 0 \; \forall t\\
+             """
+    )
+
+    st.markdown(
+        r"""In an infinite horizon case, we cannot find the solution by starting at the end and solving it backwards as we did before.
+        However, there are other methods to get an analytical or at least a numerical solution.
+        The main solution method in dynamic programming is using the **Bellman equation**. We will talk about it more in the next section, 
+        but for now, let's just look at the optimal consumption rule (policy) for the cake eating problem with CRRA utility:""",
+        unsafe_allow_html=True,
+    )
+
+    st.latex(r"""c_t^* = (1-\beta^{1/\gamma})w_t""")
+
+    st.markdown(
+        r"""
+        As in the finite horizon case, the optimal consumption in each period depends on $\beta$ and $\gamma$.<br>
+        Let's compare how they change the optimal consumption path and conduct a comparative statics analysis
+        for three sets of parameters.
+
         """,
         unsafe_allow_html=True,
     )
 
-    f3_c1, f3_c2, f3_c3 = tabs_code_theory()
+# Using columns to separate the inputs
+param_col_1, param_col_2, param_col_3 = st.columns(3)
 
-    # Sources for AIC and BIC
-    sas_source = "https://documentation.sas.com/doc/en/vfcdc/8.5/vfug/p0uawamu7dmtc2n1cllfwajyvlko.htm"
-    stata_source = "https://www.stata.com/manuals13/restatic.pdf"
-    stack_ex = "https://stats.stackexchange.com/questions/490056/aic-bic-formula-wrong-in-james-witten"
+# Inputs for first set
+with param_col_1:
+    st.markdown("#### :green[Set 1]")
+    beta_1 = st.number_input(
+        "β (patience):",
+        min_value=0.0,
+        max_value=0.99,
+        value=0.8,
+        step=0.1,
+        key="beta1",
+    )
+    gamma_1 = st.number_input(
+        "γ (consumption smoothing):",
+        min_value=0.1,
+        max_value=5.0,
+        value=1.0,
+        step=0.1,
+        key="gamma1",
+    )
 
-    with f3_c1:
-        st.markdown(
-            r"""          
-            R-sq, Adjusted R-sq, and Pseudo R-sq:<br>
-            $R^2 = \frac{SSR}{SST} = \frac{SST - SSE}{SST} = 1 - \frac{SSE}{SST}= 1- \mathbf{\frac{e'e}{y'M^0y}}$<br>
-            $\bar{R}^2 = 1 - \frac{n - 1}{n - K} (1 - R^2)$<br>
-            McFadden Pseudo  $R^2 = 1 - \frac{\text{ln} L}{\text{ln} L_0} = \frac{-\text{ln}(1-R^2)}{1+\text{ln}(2\pi) + \text{ln}(s_y^2)}$<br>
-            
-            Amemiya's Prediction Criterion (APC):<br>
-            $APC=\frac{SSE}{n-K}(1+\frac{K}{n}) = SSE \frac{n+K}{n-K}$<br>
+# Inputs for second set
+with param_col_2:
+    st.markdown("#### :blue[Set 2]")
+    beta_2 = st.number_input(
+        "β (patience):",
+        min_value=0.0,
+        max_value=0.99,
+        value=0.95,
+        step=0.1,
+        key="beta2",
+    )
+    gamma_2 = st.number_input(
+        "γ (consumption smoothing):",
+        min_value=0.1,
+        max_value=5.0,
+        value=1.0,
+        step=0.1,
+        key="gamma2",
+    )
 
-            AIC and BIC for OLS, when error variance is known (Greene p. 47):<br>
-            $AIC = \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
-            $BIC = \text{ln}(\frac{SSE}{n}) + \frac{\text{ln}(n) K}{n}$<br>
-            
-            AIC and BIC are more often calculated for any MLE as follows (Greene p. 561):<br>
-            $AIC = -2 \text{ln}(L)+2K$<br>
-            $BIC = -2 \text{ln}(L) + \text{ln}(n) K  $<br>
-            
-            In OLS, SSE is proportional to log-likelihood, so the two formulas would lead to the same model selection.<br>
-            NB: Even for OLS, Python *statsmodels*, STATA *estat ic*, and R *lm* use the latter definition, whereas SAS uses the former multiplied by $n$.
-            """,
-            unsafe_allow_html=True,
+# Inputs for third set
+with param_col_3:
+    st.markdown("#### :orange[Set 3]")
+    beta_3 = st.number_input(
+        "β (patience):",
+        min_value=0.0,
+        max_value=0.99,
+        value=0.95,
+        step=0.1,
+        key="beta3",
+    )
+    gamma_3 = st.number_input(
+        "γ (consumption smoothing):",
+        min_value=0.1,
+        max_value=5.0,
+        value=0.5,
+        step=0.1,
+        key="gamma3",
+    )
+
+
+def solve_cake_infinite(W, max_t, beta, gamma):
+    consumption = np.zeros(100)
+    remaining_cake = np.zeros(100)
+    utility = np.zeros(100)
+
+    remaining_cake[0] = W  # Initial cake size
+    target_cake = W * 0.2  # Remaining cake to signify 80% consumption
+
+    for t in range(100):
+        consumption[t] = (1 - beta ** (1 / gamma)) * remaining_cake[t]
+
+        if t < 99:
+            remaining_cake[t + 1] = remaining_cake[t] - consumption[t]
+
+        if consumption[t] > 0:
+            utility[t] = crra_utility(consumption[t], gamma) * (beta**t)
+        else:
+            utility[t] = 0
+
+    value_cumul = np.sum(utility)
+
+    # Find the period when 80% of the cake is eaten
+    if remaining_cake[-1] > target_cake:
+        periods_eat_80_pct = "More than 100"
+    else:
+        # Check if the cake was already eaten up to 80% at some earlier period.
+        # np.argmax will return the first period where the condition is True.
+        # If this happens at the last period (index 99), it means it's exactly at the end of 100 periods.
+        # So we handle this as a special case.
+        first_period_below_threshold = np.argmax(remaining_cake <= target_cake)
+        if (
+            first_period_below_threshold == 99
+            and remaining_cake[99] <= target_cake
+        ):
+            periods_eat_80_pct = 100
+        else:
+            periods_eat_80_pct = first_period_below_threshold + 1
+
+    pct_eaten_in_5 = (np.sum(consumption[:5]) / W) * 100
+
+    cum_utility_100 = np.sum(utility[:100])
+
+    return (
+        consumption[:max_t],
+        periods_eat_80_pct,
+        pct_eaten_in_5,
+        cum_utility_100,
+    )
+
+
+W_inf, max_t = 100, 20
+# First scenario
+cons_1, periods_80_1, pct_5_1, cum_util_1 = solve_cake_infinite(
+    W_inf, max_t, beta_1, gamma_1
+)
+# Second scenario
+cons_2, periods_80_2, pct_5_2, cum_util_2 = solve_cake_infinite(
+    W_inf, max_t, beta_2, gamma_2
+)
+# Third scenario
+cons_3, periods_80_3, pct_5_3, cum_util_3 = solve_cake_infinite(
+    W_inf, max_t, beta_3, gamma_3
+)
+
+
+def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
+    # Creating the plot
+    fig = go.Figure()
+
+    # Add traces
+    fig.add_trace(
+        go.Scatter(
+            x=list(range(max_t + 1)),
+            y=c_path_1,
+            mode="lines",
+            name=f"β={beta_1:.2f}, γ={gamma_1:.2f}",
+            line=dict(color="green", width=1.5, dash="solid"),
+            hovertemplate="c<sub>t</sub> = %{y:.1f}<extra></extra>",
+            hoverlabel=dict(bgcolor="green", font=dict(color="white")),
         )
-
-    with f3_c2:
-        r2_code_built_in = """
-        import statsmodels.api as sm
-        import numpy as np
-
-        model = sm.OLS(y, X).fit()
-
-        # R-sq and R-sq adjusted
-        r_sq = model.rsquared
-        r_sq_adj = model.rsquared_adj
-
-        # Pseudo R-sq
-        ln_L = model.llf
-        model_constant = sm.OLS(y, np.ones(n)).fit()
-        ln_L_0 = model_constant.llf
-        pseudo_r_sq = 1 - ln_L / ln_L_0
-
-        # Amemiya's Prediction Criterion - no built-in module
-        APC = (e.dot(e) / n) * (n + K) / (n - K)
-
-        # AIC and BIC
-        AIC = model.aic
-        BIC = model.bic
-
-        """
-
-        st.code(r2_code_built_in, language="python")
-
-    with f3_c3:
-        r2_code = """
-        import numpy as np
-        # R-sq and R-sq adjusted
-        y_centered = y - np.mean(y)
-        r_sq = 1 - e.dot(e) / y_centered.dot(y_centered)
-        r_sq_adj = 1 - ((n - 1) / (n - K)) * (1 - r_sq)
-
-        # Pseudo R-sq
-        var_y = np.var(y)
-        pseudo_r_sq = (-1 * np.log(1 - r_sq) / (1 + np.log(2 * np.pi) + np.log(var_y)))
-                
-        # Amemiya's Prediction Criterion
-        APC = (e.dot(e) / n) * (n + K) / (n - K)
-
-        # AIC and BIC, first get log likelihood
-        ln_L = (-n / 2) * (1 + np.log(2 * np.pi) + np.log(SSE / n))
-        AIC = -2 * ln_L + 2 * K
-        BIC = -2 * ln_L + K * np.log(n)
-        """
-        st.code(r2_code, language="python")
-
-s0, c05, s1 = utl.wide_col()
-
-with c05:
-    st.header("4. Proofs to remember")
-    sst_proof = "https://stats.stackexchange.com/questions/207841/why-is-sst-sse-ssr-one-variable-linear-regression/401299#401299"
-
-    with st.expander("SST = SSR + SSE"):
-        st.markdown(
-            rf"Proof from Greene Section 3.5 (also see [Stack Exchange]({sst_proof})):<br>"
-            + r"""
-                $y_i - \bar{y} = \mathbf{x}_i'\mathbf{b} + e_i$<br>
-                $y_i - \bar{y} = \hat{y}_i - \bar{y} + e_i = (\mathbf{x}_i - \mathbf{\bar{x}})'\mathbf{b} + e_i$<br>
-                $\mathbf{M^0y= M^0Xb + M^0e}$<br>
-                $SST = \mathbf{y'M^0y = b'X'M^0Xb + e'e} = SSR + SSE$<br>
-                (need to expand between last two steps, but main trick is that $\mathbf{e'M^0X = e'X=0}$)<br>
-                """,
-            unsafe_allow_html=True,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=list(range(max_t + 1)),
+            y=c_path_2,
+            mode="lines",
+            name=f"β={beta_2:.2f}, γ={gamma_2:.2f}",
+            line=dict(color="blue", width=1.5, dash="dash"),
+            hovertemplate="c<sub>t</sub> = %{y:.1f}<extra></extra>",
+            hoverlabel=dict(bgcolor="blue", font=dict(color="white")),
         )
-
-    with st.expander(
-        "Relating two formulations of AIC (Greene pp. 47 and 561)"
-    ):
-        st.markdown(
-            r"""
-            Not sure if this is useful, but it clarified things in my head.<br>
-            
-            Recall, $SSE = \mathbf{e'e}$<br>
-            In the linear model with normally distributed disturbances, the maximized log likelihood is<br>
-            $\text{ln} L = -\frac{n}{2} [1 + \text{ln}(2 \pi) + \text{ln}(\frac{SSE}{n})]$<br>
-            Ignore the constants and notice that<br>
-            $\text{ln} L \propto -\frac{n}{2} \text{ln}(\frac{SSE}{n})$<br>
-            $-2 \text{ln} L \propto n \text{ln}(\frac{SSE}{n})$<br>
-            $-2 \text{ln} L + 2K \propto n \text{ln}(\frac{SSE}{n}) + 2K$<br>
-            $-2 \text{ln} L + 2K \propto \text{ln}(\frac{SSE}{n}) + \frac{2K}{n}$<br>
-            Which we wanted to show.<br>
-            Might have been enough to just state that $\text{ln} L \propto -\text{ln}(\frac{SSE}{n})$.
-""",
-            unsafe_allow_html=True,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=list(range(max_t + 1)),
+            y=c_path_3,
+            mode="lines",
+            name=f"β={beta_3:.2f}, γ={gamma_3:.2f}",
+            line=dict(color="orange", width=1.5, dash="dot"),
+            hovertemplate="c<sub>t</sub> = %{y:.1f}<extra></extra>",
+            hoverlabel=dict(bgcolor="orange", font=dict(color="black")),
         )
+    )
 
-    st.header("5. Helpful references")
-    st.write("Check out Andrius Buteikis' book:")
+    # Update layout
+    fig.update_layout(
+        width=600,  # Width in pixels
+        height=400,
+        margin=dict(autoexpand=False, l=50, r=30, t=25, b=100, pad=0),
+        font=dict(family="Sans-Serif", color="black"),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        legend=dict(
+            x=0.05,
+            y=-0.15,
+            xanchor="left",
+            yanchor="top",
+            orientation="h",
+        ),
+        # title="",  # set title with st.markdown()
+        title=dict(
+            text=f"<b>Optimal Consumption Path</b>",
+            font=dict(size=22),
+            x=0.5,
+            xanchor="center",
+            xref="paper",
+            y=0.98,
+            yanchor="top",
+            yref="container",
+        ),
+        hovermode="x",
+        hoverlabel=dict(
+            font=dict(family="Sans-Serif", color="black"),
+            bgcolor="white",
+            bordercolor="black",
+            namelength=-1,
+        ),
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            autorange=True,
+            title=dict(text="<b>t</b>", font=dict(size=16)),
+        ),
+        yaxis=dict(
+            autorange=True,
+            showgrid=False,
+            showspikes=False,
+            title=dict(
+                text="<b>Consumption (cₜ)</b>",
+                standoff=0.2,
+                font=dict(size=16),
+            ),
+        ),
+    )
+
+    return fig
+
+
+col_inf_1, col_inf_2 = st.columns(2)
+
+with col_inf_1:
+    st.markdown(
+        "<div style='height: 23px;'></div>", unsafe_allow_html=True
+    )  # add a spacer row
+
+    st.plotly_chart(
+        plot_inf_consump(
+            W_inf,
+            max_t,
+            cons_1,
+            cons_2,
+            cons_3,
+        ),
+        theme=None,
+        use_container_width=True,
+    )
+
+set_1 = {
+    "name": "Set 1",
+    "gamma": gamma_1,
+    "beta": beta_1,
+    "periods_80": periods_80_1,
+    "pct_5": pct_5_1,
+    "cum_util": cum_util_1,
+}
+set_2 = {
+    "name": "Set 2",
+    "gamma": gamma_2,
+    "beta": beta_2,
+    "periods_80": periods_80_2,
+    "pct_5": pct_5_2,
+    "cum_util": cum_util_2,
+}
+set_3 = {
+    "name": "Set 3",
+    "gamma": gamma_3,
+    "beta": beta_3,
+    "periods_80": periods_80_3,
+    "pct_5": pct_5_3,
+    "cum_util": cum_util_3,
+}
+
+sets = [set_1, set_2, set_3]
+# Start the table and add headers
+table_html = "<table>\n"
+table_html += "    <tr><th>Name</th>"
+
+# Add column headers
+for s in sets:
+    table_html += f"<th>{s['name']}</th>"
+table_html += "</tr>\n"
+
+# List of attributes to display
+attributes = ["gamma", "beta", "periods_80", "pct_5", "cum_util"]
+
+# Loop through each attribute
+for attr in attributes:
+    table_html += f"    <tr><td>{attr.capitalize()}</td>"
+    for s in sets:
+        # Format the value based on the type
+        if attr in ["gamma", "beta"]:
+            val = f"{s[attr]:.2f}"
+        elif attr == "pct_5":
+            val = f"{s[attr]:.2f}%"
+        elif attr == "periods_80":
+            val = f"{s[attr]:.0f}"
+        else:
+            val = f"{s[attr]:.2f}"
+
+        table_html += f"<td>{val}</td>"
+    table_html += "</tr>\n"
+
+# Close the table
+table_html += "</table>"
+
+
+with col_inf_2:
+    st.markdown("#### Comparative Statics", unsafe_allow_html=True)
+    st.markdown(table_html, unsafe_allow_html=True)
+
+
+s0, c04, s1 = utl.wide_col()
+
+with c04:
+    st.header("3. Theory references")
     st.link_button(
-        "Goodness-of-Fit",
-        "http://web.vu.lt/mif/a.buteikis/wp-content/uploads/PE_Book/3-8-UnivarGoF.html",
+        "QuantEcon with Python",
+        "https://python.quantecon.org/cake_eating_problem.html",
+        type="primary",
+    )
+
+    st.link_button(
+        "Computational Economics with Python",
+        "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html",
         type="primary",
     )

@@ -86,7 +86,7 @@ pio.templates["my_streamlit"] = go.layout.Template(
         # Hover options
         hovermode="closest",
         hoverlabel=dict(
-            font=dict(family=my_font, color=my_font_color),
+            # font=dict(family=my_font, color=my_font_color),
             # bgcolor="rgb(255, 255, 255)",  # rgb(0, 0, 0, 0)
             bordercolor="black",
             namelength=-1,
