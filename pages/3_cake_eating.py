@@ -744,7 +744,7 @@ with c04:
         unsafe_allow_html=True,
     )
 
-    st.latex(r"""c_t^* = (1-\beta^{1/\gamma})w_t""")
+    st.latex(r"""c_t^*(w_t) = (1-\beta^{1/\gamma})w_t""")
 
     st.markdown(
         r"""

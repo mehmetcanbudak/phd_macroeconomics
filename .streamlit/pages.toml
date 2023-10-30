@@ -3,12 +3,18 @@ path = "intro.py"
 name = "Introduction"
 icon = "🏠"
 
-[[pages]]
-path = "pages/0_tools.py"
-name = "Must-know"
-icon = "🛠"
 
 [[pages]]
-path = "pages/1_cake_eating.py"
+path = "pages/1_glossary.py"
+name = "Glossary"
+icon = "🔮"
+
+# [[pages]]
+# path = "pages/2_tools.py"
+# name = "Must-know"
+# icon = "🛠"
+
+[[pages]]
+path = "pages/3_cake_eating.py"
 name = "Cake Eating"
 icon = "🍰"
