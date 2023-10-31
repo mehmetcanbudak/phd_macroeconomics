@@ -171,7 +171,7 @@ def log_utility(c):
     return np.log(c)
 
 
-def crra_utility(c, gamma=2):  # setting default gamma as 2, you can adjust
+def crra_utility(c, gamma=2):
     if gamma == 1:
         return np.log(c)
     else:
@@ -326,7 +326,7 @@ def plot_consumption_plotly(
             showgrid=False,
             zeroline=False,
             autorange=False,
-            title=dict(text="<b>t</b>", font=dict(size=16)),
+            title=dict(text="<b>period t</b>", font=dict(size=16)),
         ),
         yaxis=dict(
             range=[0, 1.1 * max(consumption)],
@@ -633,47 +633,31 @@ with table_col:
 
 s0, c03, s1 = utl.wide_col()
 
+# Interesting takeaways - skipping since charts are self explanatory
+# with c03:
+#     st.markdown("#### Interesting takeaways")
+#     with st.expander("Click to expand."):
+#         st.markdown(
+#             r"""
+#         1. TBD <br>
+#             $Formula \; TBD$
+#         2. TBD.
+#             """,
+#             unsafe_allow_html=True,
+#         )
+
 with c03:
-    st.markdown("### Interesting takeaways")
+    st.markdown("#### Consumption and Remaining Cake Formulas")
 
     with st.expander("Click to expand."):
-        st.markdown(
-            r"""
-        1. TBD <br>
+        st.markdown("A concise explanation can be found below:")
 
-            $Formula \; TBD$
-
-        2. TBD.
-
-            """,
-            unsafe_allow_html=True,
+        st.link_button(
+            "Computational Economics with Python",
+            "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html",
+            type="secondary",
         )
-
-with c03:
-    st.markdown("### Theory")
-
-    with st.expander("Click to expand."):
-        st.markdown("Add buttons for theory sources")
-
-        st.markdown("#### Consumption and Remaining Cake Derivation")
-
         col_c, col_w = st.columns((1, 1))
-
-        # st.markdown(
-        #     """
-        # <style>
-        # .katex-html {
-        #     text-align: left;
-        # }
-        # </style>""",
-        #     unsafe_allow_html=True,
-        # )
-        # with col_t:
-        #     st.latex("t")
-        #     st.latex("t=0")
-        #     st.latex("t=1")
-        #     st.latex("t=2")
-        #     st.latex("t=3")
 
         with col_c:
             st.latex("consumption \; c_t")
@@ -682,34 +666,22 @@ with c03:
             )
             st.latex(r"c_1 = \beta c_0")
             st.latex(r"c_2 = \beta c_1 = \beta^2 c_0")
-            st.markdown("...")
+            st.latex("...")
             st.latex(r"c_{T-1} = \frac{1}{\beta}c_T = \frac{1}{\beta}w_T")
             st.latex(r"c_{T} = \beta^{T} c_0 = w_{T} ")
 
         with col_w:
-            st.latex("rem. \; cake \; w_t")
+            st.latex("remaining \; cake \; w_t")
             st.latex("w_0 = W")
             st.latex(
                 r"w_1 = w_0 - c_0 = w_0\frac{ \sum_{t=1}^T \beta^t}{\sum_{t=0}^T \beta^t}"
             )
             st.latex(r"w_2 = w_1 - c_1 = w_1\frac{\beta }{1+\beta} ")
-            st.markdown("...")
+            st.latex("...")
             st.latex(
                 r"w_{T} = w_{T-1} - c_{T-1} = w_{T-1}\frac{\beta}{1+\beta}"
             )
-
-        st.markdown(
-            r"""
-        1. TBD <br>
-
-            $Formula \; TBD$
-
-        2. TBD.
-
-            """,
-            unsafe_allow_html=True,
-        )
-
+            st.latex(r"w_{T+1} = 0")
 
 s0, c04, s1 = utl.wide_col()
 
@@ -721,7 +693,7 @@ with c04:
     How would you choose an optimal consumption path in that case?<br>
     This might sound unrealistic, but speaking more broadly,
     a lot of optimization problems don't have a specific end date
-    (e.g., imagine that you pass the leftovers of the imperishable "cake" onto your children and they can pass it onto their children, etc.).
+    (e.g., imagine that you pass the leftovers of the imperishable cake onto your children and they can pass it onto their children, etc.).
     That's how economists often think about consumption-savings problems and other similar models.
     Therefore, it's important to get familiar with the cake eating problem in an infinite horizon case.<br>
 """,
@@ -772,9 +744,9 @@ with param_col_1:
     )
     gamma_1 = st.number_input(
         "γ (consumption smoothing):",
-        min_value=0.1,
+        min_value=0.05,
         max_value=5.0,
-        value=1.0,
+        value=0.95,
         step=0.1,
         key="gamma1",
     )
@@ -792,9 +764,9 @@ with param_col_2:
     )
     gamma_2 = st.number_input(
         "γ (consumption smoothing):",
-        min_value=0.1,
+        min_value=0.05,
         max_value=5.0,
-        value=1.0,
+        value=0.95,
         step=0.1,
         key="gamma2",
     )
@@ -812,23 +784,23 @@ with param_col_3:
     )
     gamma_3 = st.number_input(
         "γ (consumption smoothing):",
-        min_value=0.1,
+        min_value=0.05,
         max_value=5.0,
-        value=0.5,
+        value=0.8,
         step=0.1,
         key="gamma3",
     )
 
 
 def solve_cake_infinite(W, max_t, beta, gamma):
-    consumption = np.zeros(100)
-    remaining_cake = np.zeros(100)
-    utility = np.zeros(100)
+    consumption = np.zeros(max_t)
+    remaining_cake = np.zeros(max_t)
+    utility = np.zeros(max_t)
 
     remaining_cake[0] = W  # Initial cake size
-    target_cake = W * 0.2  # Remaining cake to signify 80% consumption
+    target_cons = W * 0.8  # 80% of initial cake size
 
-    for t in range(100):
+    for t in range(max_t):
         consumption[t] = (1 - beta ** (1 / gamma)) * remaining_cake[t]
 
         if t < 99:
@@ -839,53 +811,64 @@ def solve_cake_infinite(W, max_t, beta, gamma):
         else:
             utility[t] = 0
 
-    value_cumul = np.sum(utility)
+    # Calculate cumulative consumption
+    cum_consumption = np.cumsum(consumption)
 
     # Find the period when 80% of the cake is eaten
-    if remaining_cake[-1] > target_cake:
-        periods_eat_80_pct = "More than 100"
+    if cum_consumption[-1] < target_cons:
+        periods_eat_80_pct = ">1000"
     else:
-        # Check if the cake was already eaten up to 80% at some earlier period.
-        # np.argmax will return the first period where the condition is True.
-        # If this happens at the last period (index 99), it means it's exactly at the end of 100 periods.
-        # So we handle this as a special case.
-        first_period_below_threshold = np.argmax(remaining_cake <= target_cake)
-        if (
-            first_period_below_threshold == 99
-            and remaining_cake[99] <= target_cake
-        ):
-            periods_eat_80_pct = 100
-        else:
-            periods_eat_80_pct = first_period_below_threshold + 1
+        # argmax finds first max value of the array and returns its index
+        periods_eat_80_pct = np.argmax(cum_consumption >= target_cons) + 1
 
     pct_eaten_in_5 = (np.sum(consumption[:5]) / W) * 100
 
-    cum_utility_100 = np.sum(utility[:100])
+    tot_utility_1000 = np.sum(utility[:1000])
+    cum_utility = np.cumsum(utility)
 
     return (
         consumption[:max_t],
+        cum_consumption[:max_t],
+        cum_utility[:max_t],
         periods_eat_80_pct,
         pct_eaten_in_5,
-        cum_utility_100,
+        tot_utility_1000,
     )
 
 
-W_inf, max_t = 100, 20
+W_inf, max_t = 100, 1000
 # First scenario
-cons_1, periods_80_1, pct_5_1, cum_util_1 = solve_cake_infinite(
-    W_inf, max_t, beta_1, gamma_1
-)
+(
+    cons_1,
+    cum_cons_1,
+    cum_ut_1,
+    periods_80_1,
+    pct_5_1,
+    cum_util_1,
+) = solve_cake_infinite(W_inf, max_t, beta_1, gamma_1)
 # Second scenario
-cons_2, periods_80_2, pct_5_2, cum_util_2 = solve_cake_infinite(
-    W_inf, max_t, beta_2, gamma_2
-)
+(
+    cons_2,
+    cum_cons_2,
+    cum_ut_2,
+    periods_80_2,
+    pct_5_2,
+    cum_util_2,
+) = solve_cake_infinite(W_inf, max_t, beta_2, gamma_2)
 # Third scenario
-cons_3, periods_80_3, pct_5_3, cum_util_3 = solve_cake_infinite(
-    W_inf, max_t, beta_3, gamma_3
-)
+(
+    cons_3,
+    cum_cons_3,
+    cum_ut_3,
+    periods_80_3,
+    pct_5_3,
+    cum_util_3,
+) = solve_cake_infinite(W_inf, max_t, beta_3, gamma_3)
 
 
-def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
+def plot_inf_horizon(
+    W_inf, max_t, title, y_title, legend_dict, line_1, line_2, line_3
+):
     # Creating the plot
     fig = go.Figure()
 
@@ -893,7 +876,7 @@ def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
     fig.add_trace(
         go.Scatter(
             x=list(range(max_t + 1)),
-            y=c_path_1,
+            y=line_1,
             mode="lines",
             name=f"β={beta_1:.2f}, γ={gamma_1:.2f}",
             line=dict(color="green", width=1.5, dash="solid"),
@@ -904,7 +887,7 @@ def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
     fig.add_trace(
         go.Scatter(
             x=list(range(max_t + 1)),
-            y=c_path_2,
+            y=line_2,
             mode="lines",
             name=f"β={beta_2:.2f}, γ={gamma_2:.2f}",
             line=dict(color="blue", width=1.5, dash="dash"),
@@ -915,7 +898,7 @@ def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
     fig.add_trace(
         go.Scatter(
             x=list(range(max_t + 1)),
-            y=c_path_3,
+            y=line_3,
             mode="lines",
             name=f"β={beta_3:.2f}, γ={gamma_3:.2f}",
             line=dict(color="orange", width=1.5, dash="dot"),
@@ -928,20 +911,14 @@ def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
     fig.update_layout(
         width=600,  # Width in pixels
         height=400,
-        margin=dict(autoexpand=False, l=50, r=30, t=25, b=100, pad=0),
+        margin=dict(autoexpand=False, l=50, r=30, t=25, b=105, pad=0),
         font=dict(family="Sans-Serif", color="black"),
         plot_bgcolor="white",
         paper_bgcolor="white",
-        legend=dict(
-            x=0.05,
-            y=-0.15,
-            xanchor="left",
-            yanchor="top",
-            orientation="h",
-        ),
+        legend=legend_dict,
         # title="",  # set title with st.markdown()
         title=dict(
-            text=f"<b>Optimal Consumption Path</b>",
+            text=title,
             font=dict(size=22),
             x=0.5,
             xanchor="center",
@@ -960,15 +937,21 @@ def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
         xaxis=dict(
             showgrid=False,
             zeroline=False,
-            autorange=True,
-            title=dict(text="<b>t</b>", font=dict(size=16)),
+            autorange=False,
+            title=dict(text="<b>period t</b>", font=dict(size=16)),
+            tickformat=".0f",
+            rangeslider=dict(
+                visible=True, range=[0, 100], autorange=False, thickness=0.1
+            ),
+            range=[0, 20],
+            fixedrange=True,
         ),
         yaxis=dict(
             autorange=True,
             showgrid=False,
             showspikes=False,
             title=dict(
-                text="<b>Consumption (cₜ)</b>",
+                text=y_title,
                 standoff=0.2,
                 font=dict(size=16),
             ),
@@ -979,6 +962,7 @@ def plot_inf_consump(W_inf, max_t, c_path_1, c_path_2, c_path_3):
 
 
 col_inf_1, col_inf_2 = st.columns(2)
+col_inf_3, col_inf_4 = st.columns(2)
 
 with col_inf_1:
     st.markdown(
@@ -986,85 +970,225 @@ with col_inf_1:
     )  # add a spacer row
 
     st.plotly_chart(
-        plot_inf_consump(
+        plot_inf_horizon(
             W_inf,
             max_t,
-            cons_1,
-            cons_2,
-            cons_3,
+            title="<b>Optimal Consumption Path</b>",
+            y_title="<b>Consumption (cₜ)</b>",
+            legend_dict=dict(
+                x=1,
+                y=1,
+                xanchor="right",
+                yanchor="top",
+                orientation="v",
+            ),
+            line_1=cons_1,
+            line_2=cons_2,
+            line_3=cons_3,
         ),
         theme=None,
         use_container_width=True,
     )
 
-set_1 = {
-    "name": "Set 1",
-    "gamma": gamma_1,
-    "beta": beta_1,
-    "periods_80": periods_80_1,
-    "pct_5": pct_5_1,
-    "cum_util": cum_util_1,
-}
-set_2 = {
-    "name": "Set 2",
-    "gamma": gamma_2,
-    "beta": beta_2,
-    "periods_80": periods_80_2,
-    "pct_5": pct_5_2,
-    "cum_util": cum_util_2,
-}
-set_3 = {
-    "name": "Set 3",
-    "gamma": gamma_3,
-    "beta": beta_3,
-    "periods_80": periods_80_3,
-    "pct_5": pct_5_3,
-    "cum_util": cum_util_3,
-}
 
-sets = [set_1, set_2, set_3]
-# Start the table and add headers
-table_html = "<table>\n"
-table_html += "    <tr><th>Name</th>"
+with col_inf_3:
+    st.markdown(
+        "<div style='height: 23px;'></div>", unsafe_allow_html=True
+    )  # add a spacer row
 
-# Add column headers
-for s in sets:
-    table_html += f"<th>{s['name']}</th>"
-table_html += "</tr>\n"
+    st.plotly_chart(
+        plot_inf_horizon(
+            W_inf,
+            max_t,
+            title="<b>Cake Eaten Until t</b>",
+            y_title="<b>Cumulative Consumption (Σcₜ)</b>",
+            legend_dict=dict(
+                x=1,
+                y=0,
+                xanchor="right",
+                yanchor="bottom",
+                orientation="v",
+            ),
+            line_1=cum_cons_1,
+            line_2=cum_cons_2,
+            line_3=cum_cons_3,
+        ),
+        theme=None,
+        use_container_width=True,
+    )
 
-# List of attributes to display
-attributes = ["gamma", "beta", "periods_80", "pct_5", "cum_util"]
 
-# Loop through each attribute
-for attr in attributes:
-    table_html += f"    <tr><td>{attr.capitalize()}</td>"
+with col_inf_4:
+    st.markdown(
+        "<div style='height: 23px;'></div>", unsafe_allow_html=True
+    )  # add a spacer row
+
+    st.plotly_chart(
+        plot_inf_horizon(
+            W_inf,
+            max_t,
+            title="<b>Disc. Cumulative Utility Until t</b>",
+            y_title="<b>Cumulative Utility (Σβ<sup>t</sup>u(cₜ))</b>",
+            legend_dict=dict(
+                x=0.01,
+                y=1,
+                xanchor="left",
+                yanchor="top",
+                orientation="v",
+            ),
+            line_1=cum_ut_1,
+            line_2=cum_ut_2,
+            line_3=cum_ut_3,
+        ),
+        theme=None,
+        use_container_width=True,
+    )
+
+
+def comp_stat_table():
+    set_1 = {
+        "name": "Set 1",
+        "gamma": gamma_1,
+        "beta": beta_1,
+        "periods_80": periods_80_1,
+        "pct_5": pct_5_1,
+        "cum_util": cum_util_1,
+    }
+    set_2 = {
+        "name": "Set 2",
+        "gamma": gamma_2,
+        "beta": beta_2,
+        "periods_80": periods_80_2,
+        "pct_5": pct_5_2,
+        "cum_util": cum_util_2,
+    }
+    set_3 = {
+        "name": "Set 3",
+        "gamma": gamma_3,
+        "beta": beta_3,
+        "periods_80": periods_80_3,
+        "pct_5": pct_5_3,
+        "cum_util": cum_util_3,
+    }
+
+    sets = [set_1, set_2, set_3]
+    # Start the table and add headers
+    table_html = "<table>\n"
+    table_html += "    <tr><th>Name</th>"
+
+    # Add column headers
     for s in sets:
-        # Format the value based on the type
-        if attr in ["gamma", "beta"]:
-            val = f"{s[attr]:.2f}"
-        elif attr == "pct_5":
-            val = f"{s[attr]:.2f}%"
-        elif attr == "periods_80":
-            val = f"{s[attr]:.0f}"
-        else:
-            val = f"{s[attr]:.2f}"
-
-        table_html += f"<td>{val}</td>"
+        table_html += f"<th>{s['name']}</th>"
     table_html += "</tr>\n"
 
-# Close the table
-table_html += "</table>"
+    # List of attributes to display
+    attributes = ["gamma", "beta", "periods_80", "pct_5", "cum_util"]
+    attributes_clean = [
+        "Gamma",
+        "Beta",
+        "Number of periods to eat 80% of cake",
+        "Cake eaten in first 5 periods",
+        "Sum β<sup>t</sup>u(c) for first 1000 periods",
+    ]
+
+    # Loop through each attribute
+    for attr, attr_clean in zip(attributes, attributes_clean):
+        table_html += f"<tr><td style='text-align: center;'>{attr_clean}</td>"
+        for s in sets:
+            # Format the value based on the type
+            if attr in ["gamma", "beta"]:
+                val = f"{s[attr]:.2f}"
+            elif attr == "pct_5":
+                val = f"{s[attr]:.2f}%"
+            elif attr == "periods_80":
+                if s[attr] == ">1000":
+                    val = ">1000"
+                else:
+                    val = f"{s[attr]:.0f}"
+            else:
+                val = f"{s[attr]:.2f}"
+
+            table_html += f"<td style='text-align: center;'>{val}</td>\n"
+
+        table_html += "</tr>\n"
+
+    # Close the table
+    table_html += "</table>"
+
+    return table_html
 
 
 with col_inf_2:
     st.markdown("#### Comparative Statics", unsafe_allow_html=True)
-    st.markdown(table_html, unsafe_allow_html=True)
+    st.markdown(comp_stat_table(), unsafe_allow_html=True)
+    st.markdown("")
+    st.markdown(
+        r"""<div style="font-size: small;">
+                NB: Don't be confused by negative utility when γ > 1, since units of utility don't have a real meaning.
+                What we found is the optimal consumption path that leads to the highest cumulative utility possible for a given set of parameters
+                given the infinite horizon, even if the utility is negative.
+                Comparison of cumulative utilities is also not meaningful per se and is only shown to illustrate the relative changes in curvuture.
+                </div>
+                """,
+        unsafe_allow_html=True,
+    )
 
 
 s0, c04, s1 = utl.wide_col()
 
 with c04:
-    st.header("3. Theory references")
+    st.header(
+        r"3. Cake eating problem with extensions - $\delta$, $R$, and $w^\alpha$"
+    )
+    st.markdown(
+        r"""The cake eating problem can be extended to include many additional features:""",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"""
+        1. Cake can shrink over time, e.g., your friend might be secretely eating it at night.
+        Let's call this *depreciation rate* $\delta$.<br>
+        $w_{t+1} = (1-\delta)w_t - c_t$ (if cake depreciates in the morning)<br>
+        $w_{t+1} = (1-\delta)(w_t - c_t)$ (if cake depreciates over night)<br>
+        In the latter case, solution becomes:<br>
+        $c_{t+1} = \beta (1-\delta)c_t$ (Euler equation)<br>
+        $w_{t+1}^*(w_t) = (\beta^{1/\gamma})(1-\delta) w_t$<br>
+        $c_t^*(w_t) = (1-\beta^{1/\gamma})w_t$ (unchanged from before!)<br>
+        
+        2. Cake can increase over time, e.g., like in marshmallow experiment, your friend is rewarding your patience proportionally to the cake left.
+        Let's call this *interest rate* $R$.<br>
+        $w_{t+1} = R w_t - c_t$ (if interest is paid in the morning)<br>
+        $w_{t+1} = R(w_t - c_t)$ (if interested is paid at night)<br>
+        
+        3. Additional cake can also be produced, e.g., your friend is baking some new cake every day, based on how much cake was left.
+        Let's call this *production function* $w^\alpha$.<br>
+        $w_{t+1} = w_t^\alpha + w_t - c_t$<br>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # In 2 solution is the same as in 1, just rename R = 1/(1 - delta) which is often assumed since interest rate is inverse to depreciation.
+    # Solve part 1 both cases via guess-and-verify
+
+    st.markdown(
+        r"""
+        You can also receive additional cake of random size (*income shocks*), your tastes can change (*utility shocks*), you can sell some cake today and buy some tomorrow (*exchange economy*),
+        you can sell some cake and invest the money in cake production to get even more cake in the future (*consumption-investment problem*), etc. etc.<br>""",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        r"""
+        All these features will eventually be studied in the following sections but for now, let's focus on the infinite horizon case with CRRA utility
+        and see how depreciation $\delta$, interest rate $R$, and additional cake production $w^\alpha$ affect the optimal consumption in this toy model - can you spot the pattern?""",
+        unsafe_allow_html=True,
+    )
+
+s0, c05, s1 = utl.wide_col()
+
+with c05:
+    st.header("4. Theory references")
     st.link_button(
         "QuantEcon with Python",
         "https://python.quantecon.org/cake_eating_problem.html",
@@ -1076,3 +1200,6 @@ with c04:
         "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html",
         type="primary",
     )
+
+# NB timing is important
+# remaining cake indicates cake in the morning; then consumption indicates consumption throughout the day, and remaining cake next morning is remaining cake previous morning - consumption during the day

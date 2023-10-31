@@ -134,12 +134,12 @@ with c2:
             unsafe_allow_html=True,
         )
 
-        st.markdown(
-            f"""[**Top 10 theory tools**]({path_must})"""
-            + r""" **that everyone should know**
-        """,
-            unsafe_allow_html=True,
-        )
+        # st.markdown(
+        #     f"""[**Top 10 theory tools**]({path_must})"""
+        #     + r""" **that everyone should know**
+        # """,
+        #     unsafe_allow_html=True,
+        # )
 
         st.markdown(
             r"""
@@ -221,7 +221,7 @@ with c2:
     
 
      <div class="numbered-header">
-        <b>Section X: TBD</b><br>
+        <b>Section 1: TBD</b><br>
     </div>
         
     <div class="numbered">

@@ -35,7 +35,7 @@ s1, c2, s2 = utl.wide_col()
 with c2:
     st.markdown(
         r"""
-    <h5>1. Dynamic programming</h5>
+    <h5>1. Dynamic programming - intro</h5>
     """,
         unsafe_allow_html=True,
     )
@@ -47,11 +47,10 @@ with c2:
         Sequence problem:<br>
         $\max_{\{c_t\}_{t=0}^\infty} \sum_{t=0}^{\infty} \beta^t u(c_t)$<br>
 
-        Constraints (transition law, capital accumulation rule, feasible paths - used interchangeably):<br>
-        $k_{t+1} = k_t - c_t$<br>
+        Constraints (feasible paths):<br>
+        $k_{t+1} = k_t - c_t$ (law of motion, transition law, capital accumulation rule - used interchangeably)<br>
         $c_t \geq 0, k_{t+1}\geq 0 \text{ for all } t = 1, 2, ...$<br>
         $k_0 = \bar{k} \text{ given}$
-
         
         Euler equation:<br>
         $u'(c_t) = \beta u'(c_{t+1})$<br>
@@ -75,7 +74,7 @@ with c2:
 
     st.markdown(
         r"""
-        <h5>2. Bellman equation</h5>
+        <h5>2. Bellman equation - details</h5>
         """,
         unsafe_allow_html=True,
     )
@@ -99,6 +98,7 @@ with c2:
         
 
         Solution methods to the Bellman equation:<br>
+        [Useful source for examples with different solution methods](https://web.uvic.ca/~kumara/econ552/lecture3.pdf) <br>
             1. Value function iteration (VFI) - fixed point problem<br>
             2. Guess-and-verify (Value or Policy function)<br>
             3. Policy function iteration (PFI) - additional material<br>
@@ -128,9 +128,7 @@ with c2:
         $N + M \text{log}(x) = F(x, y) + \beta V(y(x, M))$<br>
         4. Split terms into those with $M$ and those with $N$.<br>
         5. Solve for $M$ and $N$ as a system of two equations.<br>
-        6. Get optimal policy function $y(x)$.
-
-        [Useful source for different solution methods](https://web.uvic.ca/~kumara/econ552/lecture3.pdf) <br>
+        6. Plug in solutions $M$ and $N$ into the optimal policy function $y(x)$.
 
         See Section 3 below for an example of guess-and-verify applied to the growth model.
 
@@ -240,7 +238,7 @@ with c2:
             Need a given $k_0$ and <br>
             Define a steady state, s.t. at some $t$, $k_{t+1} = k_t = k_{ss}$ and $c_{t+1} = c_t = c_{ss}$, then:<br>
             $k_{ss} = f(k_{ss}, 1) - c_{ss} + (1 - \delta k_{ss})$<br>
-            $c_{ss} = f(k_{ss}, 1) - \delta k_{ss})$<br>
+            $c_{ss} = f(k_{ss}, 1) - \delta k_{ss}$<br>
             
             Phase diagram:
             """,
@@ -279,7 +277,7 @@ with c2:
             $M = \frac{\alpha}{1-\beta \alpha}$<br>
             $N = \frac{1}{1 - \beta} (\text{log}(1 - \beta \alpha) + \frac{\beta \alpha}{1- \beta \alpha} \text{log} (\beta \alpha) )$<br>
 
-        6. Get optimal policy function:<br>
+        6. Plug in solutions $M$ and $N$ into the optimal policy function:<br>
         $k_{t+1} = \beta \alpha k_t^\alpha$<br>
         $c_t = (1-\beta \alpha) k_t^\alpha$<br>
 
@@ -289,7 +287,7 @@ with c2:
 
     st.markdown(
         r"""
-        <h5>4. Markets and General Equilibrium</h5>
+        <h5>4. Markets and Exchange Economy</h5>
         """,
         unsafe_allow_html=True,
     )
