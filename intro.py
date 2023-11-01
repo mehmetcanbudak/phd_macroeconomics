@@ -4,19 +4,18 @@ from st_pages import Page, show_pages_from_config
 import src.scripts.plot_themes
 import src.scripts.utils as utl
 
-utl.local_css("src/styles/styles_home.css")
-utl.external_css(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-)
-
-
-st.set_page_config(
+st.set_page_config(  # Must be called as the first Streamlit command in your sript
     page_title="PhD Macroeconomics",
     page_icon="🌐",
     layout="wide",
 )
 
 show_pages_from_config()
+
+utl.local_css("src/styles/styles_home.css")
+utl.external_css(
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+)
 
 s1, c1, c2 = utl.wide_col()
 
