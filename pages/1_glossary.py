@@ -23,11 +23,12 @@ s1, c1, s2 = utl.wide_col()
 # Dashboard header
 with c1:
     st.title("Definitions for Macroeconomics")
+    st.header("Finding the way through macro lingo")
     st.divider()
-    st.markdown(
-        r"""<h3>Let's find our way through the macro slang</h3>""",
-        unsafe_allow_html=True,
-    )
+    # st.markdown(
+    #     r"""<h3>Let's find our way through the macro slang</h3>""",
+    #     unsafe_allow_html=True,
+    # )
 
 
 s1, c2, s2 = utl.wide_col()
@@ -35,7 +36,7 @@ s1, c2, s2 = utl.wide_col()
 with c2:
     st.markdown(
         r"""
-    <h5>1. Dynamic programming - intro</h5>
+    <h5>1. Intro to dynamic programming</h5>
     """,
         unsafe_allow_html=True,
     )
@@ -74,7 +75,7 @@ with c2:
 
     st.markdown(
         r"""
-        <h5>2. Bellman equation - details</h5>
+        <h5>2. Bellman equation in detail</h5>
         """,
         unsafe_allow_html=True,
     )
@@ -285,16 +286,16 @@ with c2:
             unsafe_allow_html=True,
         )
 
-    st.markdown(
-        r"""
-        <h5>4. Markets and Exchange Economy</h5>
-        """,
-        unsafe_allow_html=True,
-    )
+#     st.markdown(
+#         r"""
+#         <h5>4. Markets and Exchange Economy</h5>
+#         """,
+#         unsafe_allow_html=True,
+#     )
 
-    with st.expander("Click to expand"):
-        st.markdown(
-            r"""
-""",
-            unsafe_allow_html=True,
-        )
+#     with st.expander("Click to expand"):
+#         st.markdown(
+#             r"""
+# """,
+#             unsafe_allow_html=True,
+#         )

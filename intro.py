@@ -4,25 +4,19 @@ from st_pages import Page, show_pages_from_config
 import src.scripts.plot_themes
 import src.scripts.utils as utl
 
+utl.local_css("src/styles/styles_home.css")
+utl.external_css(
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+)
+
+
 st.set_page_config(
     page_title="PhD Macroeconomics",
     page_icon="🌐",
     layout="wide",
 )
 
-utl.local_css("src/styles/styles_home.css")
-utl.external_css(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-)
-
 show_pages_from_config()
-
-s1, c1, c2 = utl.wide_col()
-
-utl.local_css("src/styles/styles_home.css")
-utl.external_css(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-)
 
 s1, c1, c2 = utl.wide_col()
 
@@ -58,7 +52,7 @@ with c1:
         unsafe_allow_html=True,
     )
 
-    st.markdown("My other Streamlit apps for PhD students:")
+    st.markdown("My other Econ PhD apps:")
 
     but_col1, but_col2, _ = st.columns((1, 1, 2))
 

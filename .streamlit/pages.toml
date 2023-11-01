@@ -15,6 +15,11 @@ icon = "🔮"
 # icon = "🛠"
 
 [[pages]]
-path = "pages/3_cake_eating.py"
-name = "Cake Eating"
+path = "pages/3_cake_eating_finite.py"
+name = "Cake Eating - Finite"
+icon = "🎂"
+
+[[pages]]
+path = "pages/4_cake_eating_infinite.py"
+name = "Cake Eating - Infinite"
 icon = "🍰"

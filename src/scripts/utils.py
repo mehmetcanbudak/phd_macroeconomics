@@ -1,3 +1,4 @@
+import numpy as np
 import streamlit as st
 
 
@@ -7,7 +8,9 @@ def local_css(file_path):
 
 
 def external_css(file_url):
-    st.markdown(f'<link href="{file_url}" rel="stylesheet">', unsafe_allow_html=True)
+    st.markdown(
+        f'<link href="{file_url}" rel="stylesheet">', unsafe_allow_html=True
+    )
 
 
 def wide_col():
@@ -24,3 +27,15 @@ def narrow_col_intro():
 
 def two_cols():
     return st.columns((0.1, 1, 0.2, 1, 0.1))
+
+
+### DEFINE UTILITY FUNCTIONS
+def log_utility(c):
+    return np.log(c)
+
+
+def crra_utility(c, gamma=2):
+    if gamma == 1:
+        return np.log(c)
+    else:
+        return c ** (1 - gamma) / (1 - gamma)
