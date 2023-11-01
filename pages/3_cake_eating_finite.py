@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.io as pio
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
@@ -14,9 +16,6 @@ from matplotlib.ticker import FuncFormatter
 from plotly.subplots import make_subplots
 from scipy.stats import t
 from st_pages import show_pages_from_config
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 st.set_page_config(
@@ -33,9 +32,7 @@ random_seed = 0
 #### Cake eating problem
 # Sources
 comp_econ = "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html"  # with ln(c); note a typo in the c_0 formula (no parenthesis needed in the denom)
-quant_econ = (
-    "https://python.quantecon.org/cake_eating_problem.html"  # with CRRA
-)
+quant_econ = "https://python.quantecon.org/cake_eating_problem.html"  # with CRRA
 
 uni_basel = "https://wwz.unibas.ch/fileadmin/user_upload/wwz/00_Professuren/Berentsen_Wirtschaftstheorie/Lecture_Material/Monetary_Theory/FS_2018/Dynamic_Programming.pdf"  # with ln(c) - infinite and finite
 dynamic_econ = "https://ifs.org.uk/sites/default/files/output_url_files/Dynamic%252520Economics%252520slides%252520-%252520handout.pdf"  # analytical with CRRA
@@ -119,9 +116,7 @@ with input_col:
         value=15,
         step=1,
     )
-    utility_function = st.selectbox(
-        r"Select utility function:", ["Log", "CRRA"]
-    )
+    utility_function = st.selectbox(r"Select utility function:", ["Log", "CRRA"])
 
     if utility_function == "Log":
         st.latex(r"u(c) = \text{ln}(c)")
@@ -191,9 +186,7 @@ def solve_cake_finite(W, T, beta, utility_fn, gamma=None):
     return consumption, remaining_cake
 
 
-consumption, remaining_cake = solve_cake_finite(
-    100, T, beta, utility_function, gamma
-)
+consumption, remaining_cake = solve_cake_finite(100, T, beta, utility_function, gamma)
 
 
 pio.templates.default = "my_streamlit"
@@ -349,14 +342,10 @@ def display_table(df, N=5):
             col_t1, col_t2 = st.columns((1, 1))
             with col_t1:
                 st.markdown("First 5 periods:")
-                st.dataframe(
-                    df.head(N), hide_index=True, column_config=col_config
-                )
+                st.dataframe(df.head(N), hide_index=True, column_config=col_config)
             with col_t2:
                 st.markdown("Last 5 periods:")
-                st.dataframe(
-                    df.tail(N), hide_index=True, column_config=col_config
-                )
+                st.dataframe(df.tail(N), hide_index=True, column_config=col_config)
 
 
 pie_col, table_col = st.columns((1, 0.7))
@@ -393,9 +382,7 @@ def pie_chart_animated(consumption, remaining_cake, T):
 
         # filter to not show values for slices below 4
         labels_eaten = [
-            f"c_{i}<br>{consumption[i]:.1f}"
-            if consumption[i] > 4
-            else f"c_{i}"
+            f"c_{i}<br>{consumption[i]:.1f}" if consumption[i] > 4 else f"c_{i}"
             for i in range(t + 1)
         ]
         # filter to not show any label for slices below 1
@@ -408,16 +395,12 @@ def pie_chart_animated(consumption, remaining_cake, T):
             for i in range(t + 1)
         ]
 
-        hovertext_eaten = [
-            f"c_{i} = {consumption[i]:.1f}" for i in range(t + 1)
-        ]
+        hovertext_eaten = [f"c_{i} = {consumption[i]:.1f}" for i in range(t + 1)]
 
         if t < T:
             labels = labels_eaten + [f"w_{t+1}<br>{remaining_cake[t+1]:.1f}"]
             value_remaining = [remaining_cake[t + 1]]
-            hovertext = hovertext_eaten + [
-                f"w_{t+1} = {remaining_cake[t+1]:.1f}"
-            ]
+            hovertext = hovertext_eaten + [f"w_{t+1} = {remaining_cake[t+1]:.1f}"]
         else:
             labels = labels_eaten
             hovertext = hovertext_eaten
@@ -425,9 +408,7 @@ def pie_chart_animated(consumption, remaining_cake, T):
 
         values = values_eaten + value_remaining
         pull_values = [0.05] * len(values_eaten) + [0] * len(value_remaining)
-        colors = ["green"] * len(values_eaten) + ["blue"] * len(
-            value_remaining
-        )
+        colors = ["green"] * len(values_eaten) + ["blue"] * len(value_remaining)
 
         return dict(
             labels=labels,
@@ -483,11 +464,7 @@ def pie_chart_animated(consumption, remaining_cake, T):
 
     for t_frame in range(T + 1):
         frame = go.Frame(
-            data=[
-                go.Pie(
-                    **make_pie_data(consumption, remaining_cake, T, t_frame)
-                )
-            ],
+            data=[go.Pie(**make_pie_data(consumption, remaining_cake, T, t_frame))],
             name=str(t_frame),
             layout=go.Layout(title=create_title(t_frame)),
         )
@@ -670,14 +647,20 @@ s0, c03, s1 = utl.wide_col()
 
 with c03:
     # st.markdown("#### Consumption and Remaining Cake Formulas")
-    st.header("3. Theory formulas")
-    st.markdown("A concise explanation can be found below:")
+    st.header("3. Deriving formulas")
+    st.markdown(
+        r"""Derivation is demonstrated for $u(c)=\text{log}(c)$ case.<br>
+                Solution with CRRA utility follows the same but $\beta$ becomes $\beta^{1/\gamma}$ through Euler equation.<br>
+                A concise explanation can be found below:""",
+        unsafe_allow_html=True,
+    )
 
     st.link_button(
         "Computational Economics with Python",
         "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html",
         type="secondary",
     )
+
     col_c, col_w = st.columns((1, 1))
 
     with col_c:
@@ -707,17 +690,31 @@ s0, c04, s1 = utl.wide_col()
 
 with c04:
     st.header("4. Theory references")
+    st.write("Main reference:")
     st.link_button(
-        "QuantEcon with Python",
-        "https://python.quantecon.org/cake_eating_problem.html",
-        type="primary",
-    )
-
-    st.link_button(
-        "Computational Economics with Python",
+        "Computational Economics with Python - Constrained Optimization (Prof. Juergen Jung)",
         "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html",
         type="primary",
     )
+    st.write(
+        "Finite and infinite case (guess-and-verify) with log utility; taste shocks:"
+    )
+    st.link_button(
+        "Dynamic Programming: An overview (Prof. Russell Cooper)",
+        "https://www2.econ.iastate.edu/tesfatsi/dpintro.cooper.pdf",
+        type="primary",
+    )
 
-# NB timing is important
-# remaining cake indicates cake in the morning; then consumption indicates consumption throughout the day, and remaining cake next morning is remaining cake previous morning - consumption during the day
+    st.write("Finite case with CRRA utility and interest rate:")
+    st.link_button(
+        "Dynamic economics in Practice, pp. 10-22 (Prof. Monica Costa Dias and Cormac O'Dea)",
+        "https://ifs.org.uk/sites/default/files/output_url_files/Dynamic%252520Economics%252520slides%252520-%252520handout.pdf",
+        type="primary",
+    )
+
+    st.write("Video explanation finite and infite horizon with log utility:")
+    st.link_button(
+        "Dynamic Programming Economics YouTube (by EconJohn)",
+        "https://youtube.com/playlist?list=PLLAPgKPWbsiQ0Ejh-twYC3Fr8_WA9BKCc&si=jSGmuYGe_MtnvtTP",
+        type="secondary",
+    )

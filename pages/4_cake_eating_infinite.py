@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.io as pio
+import src.scripts.plot_themes as thm
+import src.scripts.utils as utl
 import statsmodels.api as sm
 import streamlit as st
 from matplotlib import pyplot as plt
@@ -14,9 +16,6 @@ from matplotlib.ticker import FuncFormatter
 from plotly.subplots import make_subplots
 from scipy.stats import t
 from st_pages import show_pages_from_config
-
-import src.scripts.plot_themes as thm
-import src.scripts.utils as utl
 
 ### PAGE CONFIGS ###
 st.set_page_config(
@@ -33,9 +32,7 @@ random_seed = 0
 #### Cake eating problem
 # Sources
 comp_econ = "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html"  # with ln(c); note a typo in the c_0 formula (no parenthesis needed in the denom)
-quant_econ = (
-    "https://python.quantecon.org/cake_eating_problem.html"  # with CRRA
-)
+quant_econ = "https://python.quantecon.org/cake_eating_problem.html"  # with CRRA
 
 uni_basel = "https://wwz.unibas.ch/fileadmin/user_upload/wwz/00_Professuren/Berentsen_Wirtschaftstheorie/Lecture_Material/Monetary_Theory/FS_2018/Dynamic_Programming.pdf"  # with ln(c) - infinite and finite
 dynamic_econ = "https://ifs.org.uk/sites/default/files/output_url_files/Dynamic%252520Economics%252520slides%252520-%252520handout.pdf"  # analytical with CRRA
@@ -242,9 +239,7 @@ W_inf, max_t = 100, 1000
 ) = solve_cake_infinite(W_inf, max_t, beta_3, gamma_3)
 
 
-def plot_inf_horizon(
-    W_inf, max_t, title, y_title, legend_dict, line_1, line_2, line_3
-):
+def plot_inf_horizon(W_inf, max_t, title, y_title, legend_dict, line_1, line_2, line_3):
     # Creating the plot
     fig = go.Figure()
 
@@ -518,6 +513,8 @@ with c02:
         r"""The cake eating problem can be extended to include many additional features:""",
         unsafe_allow_html=True,
     )
+    # NB timing is important - covered in finite case section
+    # remaining cake indicates cake in the morning; then consumption indicates consumption throughout the day, and remaining cake next morning is remaining cake previous morning - consumption during the day
 
     st.markdown(
         r"""
@@ -525,10 +522,10 @@ with c02:
         Let's call this *depreciation rate* $\delta$.<br>
         $w_{t+1} = (1-\delta)w_t - c_t$ (if cake depreciates in the morning)<br>
         $w_{t+1} = (1-\delta)(w_t - c_t)$ (if cake depreciates over night)<br>
-        In the latter case, solution becomes:<br>
-        $c_{t+1} = \beta (1-\delta)c_t$ (Euler equation)<br>
-        $w_{t+1}^*(w_t) = (\beta^{1/\gamma})(1-\delta) w_t$<br>
-        $c_t^*(w_t) = (1-\beta^{1/\gamma})w_t$ (optimal policy same as without depreciation!)<br>
+        In the latter case, solution with CRRA utility becomes:<br>
+        $c_{t+1} = (\beta (1-\delta))^{1/\gamma}c_t$ (Euler equation)<br>
+        $c_t^*(w_t) = (1-\beta^{1/\gamma}(1-\delta)^{\frac{1-\gamma}{\gamma}})w_t$<br>
+        $w_{t+1}^*(w_t) = (\beta^{1/\gamma})(1-\delta)^{\frac{1-\gamma}{\gamma}} w_t$<br>
         
         2. Cake can increase over time, e.g., like in the marshmallow experiment, your friend is rewarding your patience proportionally to the cake left.<br>
         Let's call this *interest rate* $R$.<br>
@@ -545,6 +542,7 @@ with c02:
     )
 
     # Solve part 1 both cases via guess-and-verify
+    # Check why optimal policy doesn't change with log utility but does change with CRRA utility
 
     st.markdown(
         r"""
@@ -567,17 +565,35 @@ s0, c03, s1 = utl.wide_col()
 
 with c03:
     st.header("3. Theory references")
+    st.write("Main reference:")
     st.link_button(
-        "QuantEcon with Python",
+        "QuantEcon with Python - Cake Eating",
         "https://python.quantecon.org/cake_eating_problem.html",
         type="primary",
     )
 
+    st.write(
+        "Finite and infinite case (guess-and-verify) with log utility; taste shocks:"
+    )
     st.link_button(
-        "Computational Economics with Python",
-        "https://juejung.github.io/jdocs/Comp/html/Slides_Optimization_2_Cake.html",
+        "Dynamic Programming: An overview (Prof. Russell Cooper)",
+        "https://www2.econ.iastate.edu/tesfatsi/dpintro.cooper.pdf",
         type="primary",
     )
 
-# NB timing is important
-# remaining cake indicates cake in the morning; then consumption indicates consumption throughout the day, and remaining cake next morning is remaining cake previous morning - consumption during the day
+    st.write("Infinite case with CRRA utility and interest rate; technical notes:")
+
+    st.link_button(
+        "Notes on Dynamic Programming (Prof. Lutz Hendricks)",
+        "https://lhendricks.org/econ720/ih1/Dp_ln.pdf",
+        type="primary",
+    )
+
+    st.write(
+        "Video explanation finite and infite horizon with log utility; depreciation:"
+    )
+    st.link_button(
+        "Dynamic Programming Economics YouTube (by EconJohn)",
+        "https://youtube.com/playlist?list=PLLAPgKPWbsiQ0Ejh-twYC3Fr8_WA9BKCc&si=jSGmuYGe_MtnvtTP",
+        type="secondary",
+    )
