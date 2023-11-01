@@ -554,7 +554,7 @@ with c02:
     st.markdown(
         r"""
         All these features will eventually be studied in the following sections.
-        Let's keep this in mind and see if you can relate them back the cake eating problem!""",
+        Let's keep this in mind and see if you can relate them back to the cake eating problem!""",
         unsafe_allow_html=True,
     )
 
